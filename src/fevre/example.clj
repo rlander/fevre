@@ -1,24 +1,25 @@
 (ns fevre.example
-  (:use ring.adapter.jetty)
-  (:use ring.middleware.reload)
-  (:use ring.middleware.stacktrace)
-  (:use ring.util.response)
-  (:use fevre.core))
+  (:use ring.util.response
+        fevre.core))
 
-(defn hello [req]
-  {:body "Hello World!"
-   :headers {}
-   :status 200})
+(defn hello
+  ([req]
+    (response "Hello World!"))
+  ([req name]
+    {:body (str "Hello " name "!")
+     :headers {}
+     :status 200}))
 
 (defn anything [req]
-  (response (str "URI: " (:uri req))))
+  (response (str "URI: " (:uri req) )))
 
-(def my-routes {#"/hello/$" hello
-                #"./+" anything})
-(def app
-  (-> (router my-routes)
-      (wrap-reload '(fevre.example))
-      (wrap-stacktrace)))
+(defn sum [req f s]
+  (response (str (+ (Integer. f) (Integer. s)))))
+
+(def my-routes ["/hello/{name}/" #'hello
+                "/hello/"        #'hello
+                "/sum/{f}/{s}/"  #'sum
+                ".*"            #'anything])
 
 (defn boot []
-  (run-jetty #'app {:port 8080}))
+  (start my-routes))
