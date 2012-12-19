@@ -36,10 +36,7 @@
 
 
 (defn gen-route-map 
-  "Creates a list of hashmaps from a list of routes and updates the-routes. 
-  Ex.:
-   user=> (gen-route-map \"^/hello$\" #'hello \"^/hello/([^/]+)\" #'anything)
-   ({:params nil, :view-fun #'user/hello, :pattern \"^/hello$\"} {:params nil, :view-fun #'user/anything, :pattern \"^/hello/([^/]+)\"})"
+  "Creates a list of route-maps from a list of user routes and updates the atom the-routes."
    
    [user-routes]
    (map #(assoc (zipmap [:pattern :view-fun] %) :params nil) (partition 2 2 user-routes)))
@@ -55,15 +52,24 @@
        :else (recur (pop pat) (conj pattern (str "(" param "" regex ")")) (conj params param))))))
 
 
-(defn compile-route-map [{:keys [pattern view-fun] :as route-map}]
-  (let [[prefix & pat] (util/re-tokenize route_re pattern)
+(defn compile-route-map 
+   "Takes a route-map:
+   
+      {:pattern \"/prefix/{one}/\" <- String
+       :view-fun #'function        <- Function
+       :param nil}                 <- Vector
+   
+   Creates a JRegex pattern and updates :pattern, extracts params and updates :params"
+   
+   [{:keys [pattern view-fun] :as route-map}]
+   (let [[prefix & pat] (util/re-tokenize route_re pattern)
          rpat (vec (reverse pat))
          [valid-pattern params](make-pattern rpat)]
-    {:pattern (->> (reduce conj [prefix] valid-pattern)
-                   (s/join "")
-                   jregex/re-pattern)
-     :view-fun view-fun
-     :params (map util/trim-first-last params)}))
+     {:pattern (->> (reduce conj [prefix] valid-pattern)
+                    (s/join "")
+                    jregex/re-pattern)
+      :view-fun view-fun
+      :params (map util/trim-first-last params)}))
 
 (def app
   (-> (router)
