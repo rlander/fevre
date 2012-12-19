@@ -25,16 +25,6 @@
   (find-first (fn [route] 
                 (jregex/re-find (:pattern route) uri)) routes))
 
-(defn router []
-  (fn [request]
-      (let [routes @the-routes
-            uri (URLDecoder/decode (:uri request))]
-        (when-let [match (find-matching-url uri routes)]
-          (if (coll? (:params match))
-            (apply (:view-fun match) request (rest (jregex/re-find (:pattern match) uri)))
-            ((:view-fun match) request))))))
-
-
 (defn gen-route-map 
   "Creates a list of route-maps from a list of user routes and updates the atom the-routes."
    
@@ -70,6 +60,18 @@
                     jregex/re-pattern)
       :view-fun view-fun
       :params (map util/trim-first-last params)}))
+
+;; 
+;; Dispatch
+
+(defn router []
+  (fn [request]
+      (let [routes @the-routes
+            uri (URLDecoder/decode (:uri request))]
+        (when-let [match (find-matching-url uri routes)]
+          (if (coll? (:params match))
+            (apply (:view-fun match) request (rest (jregex/re-find (:pattern match) uri)))
+            ((:view-fun match) request))))))
 
 (def app
   (-> (router)
