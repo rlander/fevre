@@ -18,8 +18,7 @@
 
 (def my-routes ["/hello/{name}/" #'hello
                 "/hello/"        #'hello
-                "/sum/{f}/{s}/"  #'sum
-                ".*"            #'anything])
+                "/sum/{f}/{s}/"  #'sum])
 
 (defn boot []
   (start my-routes))
