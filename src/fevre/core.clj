@@ -11,7 +11,7 @@
 
 (def the-routes (atom []))
 
-(def route_re #"(\{[a-zA-Z][^\}]*\})")
+(def route-re #"(\{[a-zA-Z][^\}]*\})")
 
 (defn add-slash [url]
   (if (.endsWith url "/") 
@@ -62,7 +62,7 @@
    Creates a JRegex pattern and updates :pattern, extracts params and updates :params"
    
    [{:keys [pattern view-fun] :as route-map}]
-   (let [[prefix & pat] (util/re-tokenize route_re pattern)
+   (let [[prefix & pat] (util/re-tokenize route-re pattern)
          rpat (vec (reverse pat))
          [valid-pattern params](make-pattern rpat)]
      {:pattern (->> (reduce conj [prefix] valid-pattern)
