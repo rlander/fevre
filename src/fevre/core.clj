@@ -35,10 +35,10 @@
             ((:view-fun match) request))))))
 
 
-(defn gen-routing-table 
+(defn gen-route-map 
   "Creates a list of hashmaps from a list of routes and updates the-routes. 
   Ex.:
-   user=> (gen-routing-table \"^/hello$\" #'hello \"^/hello/([^/]+)\" #'anything)
+   user=> (gen-route-map \"^/hello$\" #'hello \"^/hello/([^/]+)\" #'anything)
    ({:params nil, :view-fun #'user/hello, :pattern \"^/hello$\"} {:params nil, :view-fun #'user/anything, :pattern \"^/hello/([^/]+)\"})"
    
    [user-routes]
@@ -70,6 +70,6 @@
 (defn start [user-routes]
   (do
     (set-logger!)
-    (let [compiled-routes (map #(compile-route %) (gen-routing-table user-routes))]
+    (let [compiled-routes (map #(compile-route %) (gen-route-map user-routes))]
       (swap! the-routes concat compiled-routes)
       (run-jetty #'app  {:port 8080}))))
