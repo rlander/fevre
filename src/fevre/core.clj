@@ -54,11 +54,14 @@
        (= param "/") (recur (pop pat) (conj pattern (str "/")) params)
        :else (recur (pop pat) (conj pattern (str "(" param "" regex ")")) (conj params param))))))
 
-(defn compile-route [{:keys [pattern view-fun] :as route-map}]
+
+(defn compile-route-map [{:keys [pattern view-fun] :as route-map}]
   (let [[prefix & pat] (util/re-tokenize route_re pattern)
          rpat (vec (reverse pat))
-         [compiled-pattern params](make-pattern rpat)]
-    {:pattern (jregex/re-pattern (s/join "" (reduce conj [prefix] compiled-pattern)))
+         [valid-pattern params](make-pattern rpat)]
+    {:pattern (->> (reduce conj [prefix] valid-pattern)
+                   (s/join "")
+                   jregex/re-pattern)
      :view-fun view-fun
      :params (map util/trim-first-last params)}))
 
@@ -70,6 +73,6 @@
 (defn start [user-routes]
   (do
     (set-logger!)
-    (let [compiled-routes (map #(compile-route %) (gen-route-map user-routes))]
+    (let [compiled-routes (map #(compile-route-map %) (gen-route-map user-routes))]
       (swap! the-routes concat compiled-routes)
       (run-jetty #'app  {:port 8080}))))
