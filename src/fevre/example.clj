@@ -25,10 +25,12 @@
                     "/hello/"        #'hello
                     "/sum/{f}/{s}/"  #'sum))
 
-(def myapp
+(def my-app
   (-> my-routes 
       (wrap-reload '(fevre.example))
       (wrap-stacktrace)))
 
-(defn start []
-  (run-jetty #'myapp  {:port 8080 :join? false}))
+(defn start
+  ([] (start 8080))
+  ([port] (run-jetty #'my-app {:port port :join? false})))
+
