@@ -2,11 +2,6 @@
   (:require [fevre.util :as util]
             [clojure.string :as s]
             [clj-jregex.core :as jregex])
-  (:use ring.middleware.reload
-        ring.middleware.stacktrace
-        ring.adapter.jetty
-        clojure.tools.logging
-        clj-logging-config.log4j)
   (:import (java.net URLDecoder)))
 
 (def the-routes (atom []))
@@ -64,6 +59,10 @@
 ;; 
 ;; Dispatch
 
+(defn urls [user-routes]
+  (let [compiled-routes (map #(compile-route-map %) (gen-route-map user-routes))]
+      (swap! the-routes concat compiled-routes)))
+
 (defn router []
   (fn [request]
       (let [routes @the-routes
@@ -73,14 +72,10 @@
             (apply (:view-fun match) request (rest (jregex/re-find (:pattern match) uri)))
             ((:view-fun match) request))))))
 
-(def app
-  (-> (router)
-      (wrap-reload '(fevre.example))
-      (wrap-stacktrace)))
+(defmacro app [& forms]
+  `(do 
+     (urls (vector ~@forms))
+     (router)))
 
-(defn start [user-routes]
-  (do
-    (set-logger!)
-    (let [compiled-routes (map #(compile-route-map %) (gen-route-map user-routes))]
-      (swap! the-routes concat compiled-routes)
-      (run-jetty #'app  {:port 8080}))))
+
+
