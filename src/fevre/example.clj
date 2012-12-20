@@ -15,9 +15,6 @@
      :headers {}
      :status 200}))
 
-(defn anything [req]
-  (response (str "URI: " (:uri req) )))
-
 (defn sum [req f s]
   (response (str (+ (Integer. f) (Integer. s)))))
 
