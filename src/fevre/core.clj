@@ -59,7 +59,7 @@
      {:pattern (->> (reduce conj [prefix] valid-pattern)
                     (s/join "")
                     jregex/re-pattern)
-      :view-fun view-fun
+      :view-fun (util/resolve-ns view-fun)
       :params params}))
 
 ;; 

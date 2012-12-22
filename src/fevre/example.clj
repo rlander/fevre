@@ -21,7 +21,7 @@
 (def my-routes (app "/hello/{name}/" #'hello
                     "/hello/"        #'hello
                     ; only matches digit characters [0-9]
-                    "/sum/{f:[0-9]+}/{s:[0-9]+}/"  #'sum))
+                    "/sum/{f:[0-9]+}/{s:[0-9]+}/" "fevre.example/sum"))
 
 (def my-app
   (-> my-routes 

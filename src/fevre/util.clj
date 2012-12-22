@@ -1,5 +1,5 @@
 (ns fevre.util
-  (:use [clojure.string :as string :only [blank?]]))
+  (:require [clojure.string :as string]))
 
 (defn re-tokenize [re text]
   (let [matcher (re-matcher re text)]
@@ -17,3 +17,14 @@
 
 (defn trim-first-last [s]
   (subs s 1 (- (.length s) 1)))
+
+(defmulti resolve-ns class)
+(defmethod resolve-ns clojure.lang.Var [v] v)
+(defmethod resolve-ns clojure.lang.Fn [f] f)
+(defmethod resolve-ns String [s]
+  (let [[nspace func] (string/split s #"\/")]
+  (try
+    (require (symbol nspace))
+    (ns-resolve (symbol nspace) (symbol func))
+    (catch Exception e 
+      (str "Unable to resolve " s ". Targets should be functions, vars or strings in the format [namespace/function]")))))
