@@ -44,13 +44,17 @@
                (recur (pop pat) (conj pattern (str "({" pname "}" regex ")")) (conj params pname)))))))
 
 (defn compile-route-map 
-   "Takes a route-map:
+   "Compiles the user-defined route and extracts the arguments:
    
-      {:pattern \"/prefix/{one}/\" <- String
-       :view-fun #'function        <- Function
-       :param nil}                 <- Vector
-   
-   Creates a JRegex pattern and updates :pattern, extracts params and updates :params"
+    in:
+      {:pattern <String>
+       :view-fun <Var | Fn | String>
+       :params nil}
+    
+    out:
+      {:pattern <JRegex>
+       :view-fun <Var>
+       :params <Vector>}"
    
    [{:keys [pattern view-fun] :as route-map}]
    (let [[prefix & pat] (util/re-tokenize route-re pattern)
