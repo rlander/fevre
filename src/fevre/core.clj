@@ -21,8 +21,16 @@
                 (jregex/re-find (:pattern route) uri)) routes))
 
 (defn gen-route-map 
-  "Creates a list of route-maps from a list of user routes and updates the atom the-routes."
-   
+  "Takes a list with route pairs (pattern, view-fun) and generates a route-map data structure
+   (HashMap) for each pair.
+    in:
+      <List>
+    out:
+      <List>:
+        {:pattern <String>
+         :view-fun <Var | Fn | String>
+         :param nil}"
+         
    [user-routes]
    (map #(assoc (zipmap [:pattern :view-fun] %) :params nil) (partition 2 2 user-routes)))
 
