@@ -82,7 +82,7 @@
   (let [compiled-routes (map #(compile-route-map %) (gen-route-map user-routes))]
       (swap! the-routes concat compiled-routes)))
 
-(defn router []
+(defn dispatcher []
   (fn [request]
       (let [routes @the-routes
             uri (URLDecoder/decode (:uri request))]
@@ -94,4 +94,4 @@
 (defmacro app [& forms]
   `(do 
      (urls (vector ~@forms))
-     (router)))
+     (dispatcher)))
