@@ -47,7 +47,7 @@
    (let [param (last pat)]
      (cond 
        (empty? pat) [(conj pattern "$") params]
-       (= param "/") (recur (pop pat) (conj pattern (str "/")) params)
+       (.startsWith param "/") (recur (pop pat) (conj pattern (str param)) params)
        :else (let [[pname regex] (split-name-regex param)]
                (recur (pop pat) (conj pattern (str "({" pname "}" regex ")")) (conj params pname)))))))
 
