@@ -32,7 +32,7 @@
          :param nil}"
          
    [user-routes]
-   (map #(assoc (zipmap [:pattern :view-fun] %) :params nil) (partition 2 2 user-routes)))
+   (map #(assoc (zipmap [:route :view-fun] %) :params nil) (partition 2 2 user-routes)))
 
 (defn split-name-regex [s]
   (let [s (util/trim-first-last s)
@@ -64,15 +64,16 @@
        :view-fun <Var>
        :params <Vector>}"
    
-   [{:keys [pattern view-fun] :as route-map}]
-   (let [[prefix & pat] (util/re-tokenize route-re pattern)
+   [{:keys [route view-fun] :as route-map}]
+   (let [[prefix & pat] (util/re-tokenize route-re route)
          rpat (vec (reverse pat))
          [valid-pattern params](make-pattern rpat)]
      {:pattern (->> (reduce conj [prefix] valid-pattern)
                     (s/join "")
                     jregex/re-pattern)
       :view-fun (util/resolve-ns view-fun)
-      :params params}))
+      :params params
+      :route route}))
 
 ;; 
 ;; Dispatch
