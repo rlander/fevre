@@ -95,3 +95,26 @@
   `(do 
      (urls (vector ~@forms))
      (dispatcher)))
+
+(defn inject-params [route view-params]
+  (let [[prefix & pat] (util/re-tokenize route-re route)
+        rpat (vec (reverse pat))]
+    (loop [pat rpat pattern [] params view-params]
+      (let [param (last pat)]
+        (cond 
+          (empty? pat) (->> (reduce conj [prefix] pattern) (s/join ""))
+          (.startsWith param "/") (recur (pop pat) (conj pattern (str param)) params)
+          :else (let [[pname regex] (split-name-regex param)]
+                  (recur (pop pat) (conj pattern (str (first params))) (pop params))))))))
+
+(defn url 
+  ([view params]
+   (let [routes @the-routes]
+     (url view params routes)))
+  ([view params routes]
+   (let [resolved-view (util/resolve-ns view)]
+     (when-let [route (find-first #(and 
+                                     (= (count params) (count (:params %))) 
+                                     (= resolved-view (:view-fun %)))
+                                  routes)]
+       (inject-params (:route route) params)))))
