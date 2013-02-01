@@ -79,7 +79,7 @@
 ;; Dispatch
 
 (defn urls [user-routes]
-  (let [compiled-routes (map #(compile-route-map %) (gen-route-map user-routes))]
+  (let [compiled-routes (map compile-route-map (gen-route-map user-routes))]
       (swap! the-routes concat compiled-routes)))
 
 (defn dispatcher []
@@ -102,7 +102,7 @@
     (loop [pat rpat pattern [] params view-params]
       (let [param (last pat)]
         (cond 
-          (empty? pat) (->> (reduce conj [prefix] pattern) (s/join ""))
+          (empty? pat) (s/join "" (reduce conj [prefix] pattern))
           (.startsWith param "/") (recur (pop pat) (conj pattern (str param)) params)
           :else (let [[pname regex] (split-name-regex param)]
                   (recur (pop pat) (conj pattern (str (first params))) (pop params))))))))

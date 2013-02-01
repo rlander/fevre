@@ -16,7 +16,7 @@
     (inner 0 [])))
 
 (defn trim-first-last [s]
-  (subs s 1 (- (.length s) 1)))
+  (subs s 1 (dec (.length s))))
 
 (defmulti resolve-ns class)
 (defmethod resolve-ns clojure.lang.Var [v] v)
